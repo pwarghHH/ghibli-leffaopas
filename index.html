@@ -11,38 +11,16 @@
   <!-- Bootstrap Icons (valinnainen) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
-    :root {
-      --brand: #0ea5e9;
-    }
-    body {
-      background: #0b1220; /* tumma tausta moderniin lookiin */
-      color: #e2e8f0;
-    }
-    .navbar {
-      background: linear-gradient(90deg, rgba(14,165,233,0.15), rgba(99,102,241,0.15));
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
+    :root { --brand: #0ea5e9; }
+    body { background: #0b1220; color: #e2e8f0; }
+    .navbar { background: linear-gradient(90deg, rgba(14,165,233,0.15), rgba(99,102,241,0.15)); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); transition: transform .15s ease, box-shadow .15s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
     .badge-score { background: #22c55e; }
     .badge-year { background: #64748b; }
     .btn-brand { background: var(--brand); border: none; }
     .btn-brand:hover { filter: brightness(1.05); }
-    .banner {
-      position: relative;
-      border-radius: 1rem;
-      overflow: hidden;
-      min-height: 220px;
-      background: linear-gradient(180deg, rgba(14,165,233,0.2), rgba(2,6,23,0.8));
-    }
+    .banner { position: relative; border-radius: 1rem; overflow: hidden; min-height: 220px; background: linear-gradient(180deg, rgba(14,165,233,0.2), rgba(2,6,23,0.8)); }
     .banner img { object-fit: cover; width: 100%; height: 100%; opacity: .45; }
     .banner .overlay { position: absolute; inset: 0; background: radial-gradient(60% 60% at 50% 50%, rgba(14,165,233,0.18), rgba(2,6,23,0.9)); }
     .banner .content { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 2rem; }
@@ -75,8 +53,8 @@
       <div class="overlay"></div>
       <div class="content">
         <div>
-          <h1 class="display-5 fw-bold">Studio Ghiblin elokuvat</h1>
-          <p class="lead text-white-50">Voit etsiä tai selata elokuvia ja lukea tarkemmat tiedot.</p>
+          <h1 class="display-5 fw-bold">Studio Ghiblin taika, yhdessä paikassa</h1>
+          <p class="lead text-white-50">Selaa elokuvia, suodata, ja avaa yksityiskohdat – data haetaan julkisesta JSON‑rajapinnasta.</p>
           <a class="btn btn-brand btn-lg mt-2" href="#lista"><i class="bi bi-arrow-down-circle"></i> Aloita selaus</a>
         </div>
       </div>
@@ -87,7 +65,7 @@
   <section class="container" id="lista">
     <div class="row g-3 align-items-center">
       <div class="col-12 col-md-6">
-        <label for="haku" class="form-label mb-1">Haku nimellä tai ohjaajalla</label>
+        <label for="haku" class="form-label mb-1">Haku nimellä / ohjaajalla</label>
         <div class="input-group">
           <span class="input-group-text"><i class="bi bi-search"></i></span>
           <input id="haku" class="form-control" type="search" placeholder="Esim. Spirited Away tai Miyazaki" />
@@ -120,6 +98,12 @@
   <!-- Lista -->
   <main class="container my-4">
     <div id="grid" class="row g-4"></div>
+
+    <!-- NÄYTÄ LISÄÄ -NAPPi -->
+    <div class="text-center my-3">
+      <button id="loadMore" class="btn btn-outline-light d-none">Näytä lisää</button>
+    </div>
+
     <div id="virhe" class="alert alert-danger d-none mt-3" role="alert">
       <i class="bi bi-exclamation-triangle"></i> Jokin meni pieleen tietoja haettaessa. Yritä hetken päästä uudelleen.
     </div>
@@ -132,7 +116,7 @@
         <div class="card p-3 p-md-4">
           <h2 class="h4">Mitä täällä tapahtuu?</h2>
           <p>
-            Tämä sivu on opiskelijan demoprojekti Haaga-Helian Digitekniikat‑kurssille. Sivusto on rakennettu <strong>Bootstrap 5</strong> ‑kirjastolla ja se hakee JSON‑dataa
+            Tämä on esimerkkiprojekti Digitekniikat‑kurssille. Sivusto on rakennettu <strong>Bootstrap 5</strong> ‑kirjastolla ja se hakee JSON‑dataa
             <code>https://ghibliapi.vercel.app/films</code> ‑rajapinnasta. Hakutulokset näytetään responsiivisena korttiruudukona.
           </p>
           <ul>
@@ -174,28 +158,16 @@
           <div class="row g-3">
             <div class="col-md-6">
               <div class="list-group small">
-                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
-                  <span>Ohjaaja</span><strong id="modalDirector"></strong>
-                </div>
-                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
-                  <span>Tuottaja</span><strong id="modalProducer"></strong>
-                </div>
-                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
-                  <span>Julkaisuvuosi</span><strong id="modalYear"></strong>
-                </div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between"><span>Ohjaaja</span><strong id="modalDirector"></strong></div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between"><span>Tuottaja</span><strong id="modalProducer"></strong></div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between"><span>Julkaisuvuosi</span><strong id="modalYear"></strong></div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="list-group small">
-                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
-                  <span>Kesto</span><strong id="modalRuntime"></strong>
-                </div>
-                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
-                  <span>Rotten Tomatoes</span><strong id="modalScore"></strong>
-                </div>
-                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
-                  <span>Alkuperäinen nimi</span><strong id="modalOriginal"></strong>
-                </div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between"><span>Kesto</span><strong id="modalRuntime"></strong></div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between"><span>Rotten Tomatoes</span><strong id="modalScore"></strong></div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between"><span>Alkuperäinen nimi</span><strong id="modalOriginal"></strong></div>
               </div>
             </div>
           </div>
@@ -225,6 +197,10 @@
     const jarjestys = document.getElementById('jarjestys');
     const minScore = document.getElementById('minScore');
 
+    const loadMoreBtn = document.getElementById('loadMore');
+    let pageSize = 9;             // montako näytetään / lisätään kerrallaan
+    let visibleCount = pageSize;  // aloitusmäärä
+
     const infoModalEl = document.getElementById('infoModal');
     const infoModal = new bootstrap.Modal(infoModalEl);
 
@@ -249,15 +225,26 @@
       return 0;
     };
 
+    function paivitaLoadMoreVisibility() {
+      if (visibleCount >= suodatettu.length) {
+        loadMoreBtn.classList.add('d-none');
+      } else {
+        loadMoreBtn.classList.remove('d-none');
+      }
+    }
+
     function render() {
       grid.innerHTML = '';
       if (!suodatettu.length) {
         grid.innerHTML = '<div class="col-12"><div class="alert alert-info">Ei tuloksia nykyisillä suodattimilla.</div></div>';
+        loadMoreBtn.classList.add('d-none');
         return;
       }
 
+      const naytettava = suodatettu.slice(0, visibleCount);
       const frag = document.createDocumentFragment();
-      suodatettu.forEach(f => {
+
+      naytettava.forEach(f => {
         const col = document.createElement('div');
         col.className = 'col-12 col-sm-6 col-lg-4';
 
@@ -298,7 +285,9 @@
         col.append(card);
         frag.append(col);
       });
+
       grid.append(frag);
+      paivitaLoadMoreVisibility();
     }
 
     function suodataJaJarjesta() {
@@ -324,6 +313,7 @@
           suodatettu.sort(by('title', 'asc', v => (v||'').toString().toLowerCase()));
       }
 
+      visibleCount = pageSize; // aloita alusta aina kun suodatus/järjestys muuttuu
       render();
     }
 
@@ -337,14 +327,8 @@
       modalRuntime.textContent = (f.running_time ? f.running_time + ' min' : '—');
       modalScore.textContent = f.rt_score;
       modalOriginal.textContent = f.original_title || '—';
-      // Wikidata/URL: API:ssa on joskus url‑kenttä. Jos ei, piilotetaan nappi.
-      if (f.url) {
-        modalWiki.classList.remove('disabled');
-        modalWiki.href = f.url;
-      } else {
-        modalWiki.href = '#';
-        modalWiki.classList.add('disabled');
-      }
+      if (f.url) { modalWiki.classList.remove('disabled'); modalWiki.href = f.url; }
+      else { modalWiki.href = '#'; modalWiki.classList.add('disabled'); }
       infoModal.show();
     }
 
@@ -356,7 +340,6 @@
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         filmit = Array.isArray(data) ? data : [];
-        // aseta hero‑kuvaksi jonkin satunnaisen bannerin
         const random = filmit.find(f => f.movie_banner) || filmit[0];
         const heroImg = document.getElementById('heroImg');
         if (random && heroImg) heroImg.src = random.movie_banner;
@@ -373,6 +356,11 @@
     haku.addEventListener('input', suodataJaJarjesta);
     jarjestys.addEventListener('change', suodataJaJarjesta);
     minScore.addEventListener('input', suodataJaJarjesta);
+
+    loadMoreBtn.addEventListener('click', () => {
+      visibleCount += pageSize;
+      render();
+    });
 
     // Käynnistys
     haeData();
