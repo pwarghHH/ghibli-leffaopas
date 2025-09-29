@@ -14,8 +14,8 @@
     :root { --brand: #0ea5e9; }
     body { background: #0b1220; color: #e2e8f0; }
     .navbar { background: linear-gradient(90deg, rgba(14,165,233,0.15), rgba(99,102,241,0.15)); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); transition: transform .15s ease, box-shadow .15s ease; }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); transition: transform .15s ease, box-shadow .15s ease, background .2s ease; color:#f8fafc; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); background: rgba(255,255,255,0.12); }
     .badge-score { background: #22c55e; }
     .badge-year { background: #64748b; }
     .btn-brand { background: var(--brand); border: none; }
@@ -33,7 +33,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
-      <a class="navbar-brand fw-semibold text-white" href="#"><i class="bi bi-film"></i> Ghibli‑leffaopas</a>
+      <a class="navbar-brand fw-semibold text-white" href="#"><i class="bi bi-film"></i> Ghibli-leffaopas</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -53,8 +53,8 @@
       <div class="overlay"></div>
       <div class="content">
         <div>
-          <h1 class="display-5 fw-bold">Studio Ghiblin elokuvat</h1>
-          <p class="lead text-white-50">Löydä elokuvat ja niiden tiedot helposti</p>
+          <h1 class="display-5 fw-bold">Studio Ghiblin taika, yhdessä paikassa</h1>
+          <p class="lead text-white-50">Selaa elokuvia, suodata, ja avaa yksityiskohdat – data haetaan julkisesta JSON-rajapinnasta.</p>
           <a class="btn btn-brand btn-lg mt-2" href="#lista"><i class="bi bi-arrow-down-circle"></i> Aloita selaus</a>
         </div>
       </div>
@@ -65,7 +65,7 @@
   <section class="container" id="lista">
     <div class="row g-3 align-items-center">
       <div class="col-12 col-md-6">
-        <label for="haku" class="form-label mb-1">Hae nimellä tai ohjaajalla</label>
+        <label for="haku" class="form-label mb-1">Haku nimellä / ohjaajalla</label>
         <div class="input-group">
           <span class="input-group-text"><i class="bi bi-search"></i></span>
           <input id="haku" class="form-control" type="search" placeholder="Esim. Spirited Away tai Miyazaki" />
@@ -76,12 +76,12 @@
         <select id="jarjestys" class="form-select">
           <option value="title">Nimi (A–Ö)</option>
           <option value="release_date">Vuosi (uusin ensin)</option>
-          <option value="rt_score">RT‑pisteet (korkein ensin)</option>
+          <option value="rt_score">RT-pisteet (korkein ensin)</option>
           <option value="running_time">Kesto (pisin ensin)</option>
         </select>
       </div>
       <div class="col-6 col-md-3">
-        <label for="minScore" class="form-label mb-1">Minimi RT‑pisteet</label>
+        <label for="minScore" class="form-label mb-1">Minimi RT-pisteet</label>
         <input id="minScore" class="form-control" type="number" min="0" max="100" step="1" value="0" />
       </div>
     </div>
@@ -116,12 +116,12 @@
         <div class="card p-3 p-md-4">
           <h2 class="h4">Mitä täällä tapahtuu?</h2>
           <p>
-            Tämä sivu on opiskelijan demoprojekti Haaga-Helian Digitekniikat‑kurssille. JSON‑data haetaan
-            <code>https://ghibliapi.vercel.app/films</code> ‑rajapinnasta.
+            Tämä on esimerkkiprojekti Digitekniikat-kurssille. Sivusto on rakennettu <strong>Bootstrap 5</strong> -kirjastolla ja se hakee JSON-dataa
+            <code>https://ghibliapi.vercel.app/films</code> -rajapinnasta. Hakutulokset näytetään responsiivisena korttiruudukona.
           </p>
           <ul>
-            <li>Bootstrap‑elementtejä: Navbar, Cards, Modal, Spinner, Badges, Input Group, Form Select.</li>
-            <li>Lisätoimintoja: haku, lajittelu, piste‑suodatus, latausindikaattori, virheilmoitus.</li>
+            <li>Bootstrap-elementtejä: Navbar, Cards, Modal, Spinner, Badges, Input Group, Form Select.</li>
+            <li>Lisätoimintoja: haku, lajittelu, piste-suodatus, latausindikaattori, virheilmoitus.</li>
           </ul>
         </div>
       </div>
@@ -129,9 +129,9 @@
         <div class="card p-3 p-md-4">
           <h3 class="h5">Tekniset tiedot</h3>
           <ul class="mb-0 small">
-            <li>Vain yksi HTML‑tiedosto (helppo palauttaa)</li>
-            <li>CDN‑linkit Bootstrapille & ikoneille</li>
-            <li>Vanilla JS (ei build‑työkaluja)</li>
+            <li>Vain yksi HTML-tiedosto (helppo palauttaa)</li>
+            <li>CDN-linkit Bootstrapille & ikoneille</li>
+            <li>Vanilla JS (ei build-työkaluja)</li>
           </ul>
         </div>
       </div>
@@ -141,7 +141,7 @@
   <!-- Footer -->
   <footer class="container my-5 footer">
     <hr class="border-secondary" />
-    <p class="mb-0">Haaga-Helia Digitekniikat-kurssin harjoitusprojekti. Elokuvatiedot: Studio Ghibli API</p>
+    <p class="mb-0">Digitekniikat-kurssin harjoitusprojekti. Elokuvatiedot: Studio Ghibli API.</p>
   </footer>
 
   <!-- Modal yksityiskohdille -->
@@ -204,7 +204,7 @@
     const infoModalEl = document.getElementById('infoModal');
     const infoModal = new bootstrap.Modal(infoModalEl);
 
-    // Modal‑elementit
+    // Modal-elementit
     const modalTitle = document.getElementById('modalTitle');
     const modalBanner = document.getElementById('modalBanner');
     const modalDesc = document.getElementById('modalDesc');
