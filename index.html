@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ghibli-leffaopas</title>
+  <meta name="description" content="Responsiivinen Bootstrap 5 -sivusto, joka hakee Studio Ghiblin elokuvat JSON-rajapinnasta." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons (valinnainen) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #0ea5e9;
+    }
+    body {
+      background: #0b1220; /* tumma tausta moderniin lookiin */
+      color: #e2e8f0;
+    }
+    .navbar {
+      background: linear-gradient(90deg, rgba(14,165,233,0.15), rgba(99,102,241,0.15));
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .badge-score { background: #22c55e; }
+    .badge-year { background: #64748b; }
+    .btn-brand { background: var(--brand); border: none; }
+    .btn-brand:hover { filter: brightness(1.05); }
+    .banner {
+      position: relative;
+      border-radius: 1rem;
+      overflow: hidden;
+      min-height: 220px;
+      background: linear-gradient(180deg, rgba(14,165,233,0.2), rgba(2,6,23,0.8));
+    }
+    .banner img { object-fit: cover; width: 100%; height: 100%; opacity: .45; }
+    .banner .overlay { position: absolute; inset: 0; background: radial-gradient(60% 60% at 50% 50%, rgba(14,165,233,0.18), rgba(2,6,23,0.9)); }
+    .banner .content { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 2rem; }
+    .form-control, .form-select { background: rgba(15,23,42,0.8); color: #e2e8f0; border-color: rgba(255,255,255,0.12); }
+    .form-control::placeholder { color: #9ca3af; }
+    .footer { color:#94a3b8; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-semibold text-white" href="#"><i class="bi bi-film"></i> Ghibli‑leffaopas</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link text-white-50" href="#lista">Elokuvat</a></li>
+          <li class="nav-item"><a class="nav-link text-white-50" href="#tietoa">Tietoa</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero/banner -->
+  <header class="container my-4">
+    <div class="banner">
+      <img id="heroImg" alt="Studio Ghibli banneri" />
+      <div class="overlay"></div>
+      <div class="content">
+        <div>
+          <h1 class="display-5 fw-bold">Studio Ghiblin taika, yhdessä paikassa</h1>
+          <p class="lead text-white-50">Selaa elokuvia, suodata, ja avaa yksityiskohdat – data haetaan julkisesta JSON‑rajapinnasta.</p>
+          <a class="btn btn-brand btn-lg mt-2" href="#lista"><i class="bi bi-arrow-down-circle"></i> Aloita selaus</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Suodatuspalkki -->
+  <section class="container" id="lista">
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-md-6">
+        <label for="haku" class="form-label mb-1">Haku nimellä / ohjaajalla</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input id="haku" class="form-control" type="search" placeholder="Esim. Spirited Away tai Miyazaki" />
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <label for="jarjestys" class="form-label mb-1">Järjestys</label>
+        <select id="jarjestys" class="form-select">
+          <option value="title">Nimi (A–Ö)</option>
+          <option value="release_date">Vuosi (uusin ensin)</option>
+          <option value="rt_score">RT‑pisteet (korkein ensin)</option>
+          <option value="running_time">Kesto (pisin ensin)</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label for="minScore" class="form-label mb-1">Minimi RT‑pisteet</label>
+        <input id="minScore" class="form-control" type="number" min="0" max="100" step="1" value="0" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Latausindikaattori -->
+  <div class="container my-4" id="loaderWrap">
+    <div class="d-flex align-items-center gap-3">
+      <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
+      <strong>Ladataan elokuvia…</strong>
+    </div>
+  </div>
+
+  <!-- Lista -->
+  <main class="container my-4">
+    <div id="grid" class="row g-4"></div>
+    <div id="virhe" class="alert alert-danger d-none mt-3" role="alert">
+      <i class="bi bi-exclamation-triangle"></i> Jokin meni pieleen tietoja haettaessa. Yritä hetken päästä uudelleen.
+    </div>
+  </main>
+
+  <!-- Tietoa -->
+  <section id="tietoa" class="container my-5">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card p-3 p-md-4">
+          <h2 class="h4">Mitä täällä tapahtuu?</h2>
+          <p>
+            Tämä on esimerkkiprojekti Digitekniikat‑kurssille. Sivusto on rakennettu <strong>Bootstrap 5</strong> ‑kirjastolla ja se hakee JSON‑dataa
+            <code>https://ghibliapi.vercel.app/films</code> ‑rajapinnasta. Hakutulokset näytetään responsiivisena korttiruudukona.
+          </p>
+          <ul>
+            <li>Bootstrap‑elementtejä: Navbar, Cards, Modal, Spinner, Badges, Input Group, Form Select.</li>
+            <li>Lisätoimintoja: haku, lajittelu, piste‑suodatus, latausindikaattori, virheilmoitus.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card p-3 p-md-4">
+          <h3 class="h5">Tekniset tiedot</h3>
+          <ul class="mb-0 small">
+            <li>Vain yksi HTML‑tiedosto (helppo palauttaa)</li>
+            <li>CDN‑linkit Bootstrapille & ikoneille</li>
+            <li>Vanilla JS (ei build‑työkaluja)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="container my-5 footer">
+    <hr class="border-secondary" />
+    <p class="mb-0">Rakennettu Bootstrap 5:llä opiskelukäyttöön. Studio Ghibli ‑data © lähteensä omistajille.</p>
+  </footer>
+
+  <!-- Modal yksityiskohdille -->
+  <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content bg-dark text-light border border-secondary">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Elokuvan tiedot</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Sulje"></button>
+        </div>
+        <div class="modal-body">
+          <img id="modalBanner" class="img-fluid rounded mb-3" alt="Elokuvan banneri" />
+          <p id="modalDesc" class="mb-3"></p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="list-group small">
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                  <span>Ohjaaja</span><strong id="modalDirector"></strong>
+                </div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                  <span>Tuottaja</span><strong id="modalProducer"></strong>
+                </div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                  <span>Julkaisuvuosi</span><strong id="modalYear"></strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="list-group small">
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                  <span>Kesto</span><strong id="modalRuntime"></strong>
+                </div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                  <span>Rotten Tomatoes</span><strong id="modalScore"></strong>
+                </div>
+                <div class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                  <span>Alkuperäinen nimi</span><strong id="modalOriginal"></strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sulje</button>
+          <a id="modalWiki" class="btn btn-brand" target="_blank" rel="noopener">Avaa Wikidata</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <script>
+    // ------- Yleiset muuttujat -------
+    const API_URL = 'https://ghibliapi.vercel.app/films';
+    let filmit = []; // raakadata
+    let suodatettu = []; // näkymään tuleva data
+
+    const grid = document.getElementById('grid');
+    const loaderWrap = document.getElementById('loaderWrap');
+    const virhe = document.getElementById('virhe');
+
+    const haku = document.getElementById('haku');
+    const jarjestys = document.getElementById('jarjestys');
+    const minScore = document.getElementById('minScore');
+
+    const infoModalEl = document.getElementById('infoModal');
+    const infoModal = new bootstrap.Modal(infoModalEl);
+
+    // Modal‑elementit
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBanner = document.getElementById('modalBanner');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalDirector = document.getElementById('modalDirector');
+    const modalProducer = document.getElementById('modalProducer');
+    const modalYear = document.getElementById('modalYear');
+    const modalRuntime = document.getElementById('modalRuntime');
+    const modalScore = document.getElementById('modalScore');
+    const modalOriginal = document.getElementById('modalOriginal');
+    const modalWiki = document.getElementById('modalWiki');
+
+    // ------- Apufunktiot -------
+    const by = (key, dir = 'asc', parse = (v)=>v) => (a,b) => {
+      const va = parse(a[key]);
+      const vb = parse(b[key]);
+      if (va < vb) return dir === 'asc' ? -1 : 1;
+      if (va > vb) return dir === 'asc' ? 1 : -1;
+      return 0;
+    };
+
+    function render() {
+      grid.innerHTML = '';
+      if (!suodatettu.length) {
+        grid.innerHTML = '<div class="col-12"><div class="alert alert-info">Ei tuloksia nykyisillä suodattimilla.</div></div>';
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+      suodatettu.forEach(f => {
+        const col = document.createElement('div');
+        col.className = 'col-12 col-sm-6 col-lg-4';
+
+        const card = document.createElement('div');
+        card.className = 'card h-100';
+
+        const img = document.createElement('img');
+        img.src = f.image || f.movie_banner || '';
+        img.className = 'card-img-top';
+        img.alt = f.title + ' kansi';
+        img.loading = 'lazy';
+
+        const body = document.createElement('div');
+        body.className = 'card-body d-flex flex-column';
+
+        const title = document.createElement('h5');
+        title.className = 'card-title';
+        title.textContent = f.title;
+
+        const meta = document.createElement('div');
+        meta.className = 'd-flex flex-wrap gap-2 mb-2';
+        meta.innerHTML = `
+          <span class="badge badge-year">${f.release_date}</span>
+          <span class="badge badge-score"><i class="bi bi-star-fill"></i> ${f.rt_score}</span>
+        `;
+
+        const desc = document.createElement('p');
+        desc.className = 'card-text text-white-50 small flex-grow-1';
+        desc.textContent = f.description.slice(0, 140) + (f.description.length > 140 ? '…' : '');
+
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-brand mt-2 align-self-start';
+        btn.innerHTML = '<i class="bi bi-info-circle"></i> Lisätiedot';
+        btn.addEventListener('click', () => avaaModal(f));
+
+        body.append(title, meta, desc, btn);
+        card.append(img, body);
+        col.append(card);
+        frag.append(col);
+      });
+      grid.append(frag);
+    }
+
+    function suodataJaJarjesta() {
+      const q = haku.value.trim().toLowerCase();
+      const min = Number(minScore.value) || 0;
+
+      suodatettu = filmit.filter(f => {
+        const hay = (f.title + ' ' + f.original_title + ' ' + f.director).toLowerCase();
+        return hay.includes(q) && Number(f.rt_score) >= min;
+      });
+
+      switch (jarjestys.value) {
+        case 'release_date':
+          suodatettu.sort(by('release_date', 'desc', Number));
+          break;
+        case 'rt_score':
+          suodatettu.sort(by('rt_score', 'desc', Number));
+          break;
+        case 'running_time':
+          suodatettu.sort(by('running_time', 'desc', Number));
+          break;
+        default:
+          suodatettu.sort(by('title', 'asc', v => (v||'').toString().toLowerCase()));
+      }
+
+      render();
+    }
+
+    function avaaModal(f) {
+      modalTitle.textContent = f.title;
+      modalBanner.src = f.movie_banner || f.image || '';
+      modalDesc.textContent = f.description;
+      modalDirector.textContent = f.director;
+      modalProducer.textContent = f.producer;
+      modalYear.textContent = f.release_date;
+      modalRuntime.textContent = (f.running_time ? f.running_time + ' min' : '—');
+      modalScore.textContent = f.rt_score;
+      modalOriginal.textContent = f.original_title || '—';
+      // Wikidata/URL: API:ssa on joskus url‑kenttä. Jos ei, piilotetaan nappi.
+      if (f.url) {
+        modalWiki.classList.remove('disabled');
+        modalWiki.href = f.url;
+      } else {
+        modalWiki.href = '#';
+        modalWiki.classList.add('disabled');
+      }
+      infoModal.show();
+    }
+
+    async function haeData() {
+      loaderWrap.classList.remove('d-none');
+      virhe.classList.add('d-none');
+      try {
+        const res = await fetch(API_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        filmit = Array.isArray(data) ? data : [];
+        // aseta hero‑kuvaksi jonkin satunnaisen bannerin
+        const random = filmit.find(f => f.movie_banner) || filmit[0];
+        const heroImg = document.getElementById('heroImg');
+        if (random && heroImg) heroImg.src = random.movie_banner;
+        suodataJaJarjesta();
+      } catch (e) {
+        console.error(e);
+        virhe.classList.remove('d-none');
+      } finally {
+        loaderWrap.classList.add('d-none');
+      }
+    }
+
+    // ------- Tapahtumat -------
+    haku.addEventListener('input', suodataJaJarjesta);
+    jarjestys.addEventListener('change', suodataJaJarjesta);
+    minScore.addEventListener('input', suodataJaJarjesta);
+
+    // Käynnistys
+    haeData();
+  </script>
+</body>
+</html>
