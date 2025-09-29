@@ -27,6 +27,32 @@
     .form-control, .form-select { background: rgba(15,23,42,0.8); color: #e2e8f0; border-color: rgba(255,255,255,0.12); }
     .form-control::placeholder { color: #9ca3af; }
     .footer { color:#94a3b8; }
+    /* --- Lisäykset mobiiliongelman korjaamiseksi --- */
+.banner {
+  min-height: 260px; /* hieman lisää korkeutta */
+}
+
+.banner .content {
+  padding: 2rem 1rem 3.25rem; /* lisää tilaa alalaitaan napille */
+}
+
+/* Mobiililaitteille erikoissäädöt */
+@media (max-width: 576px) {
+  .banner {
+    min-height: 340px; /* vielä enemmän korkeutta */
+  }
+  .banner .content h1 {
+    font-size: 1.75rem; /* pienempi otsikko */
+  }
+  .banner .content .lead {
+    font-size: 1rem;
+    margin-bottom: .5rem;
+  }
+  .btn.btn-lg {
+    padding: .6rem 1rem;
+    font-size: 1rem;
+  }
+}
   </style>
 </head>
 <body>
